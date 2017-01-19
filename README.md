@@ -38,7 +38,7 @@ To create a Role model in your project use the following:
 ```php
 namespace App\Models;
 
-use \DmitryBubyakin\RBAC\Models\Role as BaseRole;
+use DmitryBubyakin\RBAC\Models\Role as BaseRole;
 
 class Role extends BaseRole{
 	
@@ -50,7 +50,7 @@ To create a Permission model in your project use the following:
 ```php
 namespace App\Models;
 
-use \DmitryBubyakin\RBAC\Models\Permission as BasePermission;
+use DmitryBubyakin\RBAC\Models\Permission as BasePermission;
 
 class Permission extends BasePermission{
 	
