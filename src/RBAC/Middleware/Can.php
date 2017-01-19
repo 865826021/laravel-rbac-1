@@ -16,12 +16,13 @@ class Can
      * @param  \Illuminate\Http\Request $request
      * @param  Closure $next
      * @param  string|array $permissions
+     * @param  bool $require
      * @return mixed
      */
-    public function handle($request, Closure $next, $permissions)
+    public function handle($request, Closure $next, $permissions, $require = true)
     {
 
-        if (Auth::guest() || !Auth::user()->can($permissions)) {
+        if (Auth::guest() || !Auth::user()->can($permissions,$require)) {
             abort(403);
         }
 

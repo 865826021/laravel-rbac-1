@@ -4,7 +4,6 @@ namespace DmitryBubyakin\RBAC\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 use DmitryBubyakin\RBAC\Contracts\Role as RoleInterface;
 
 class Role extends Model implements RoleInterface
@@ -16,7 +15,7 @@ class Role extends Model implements RoleInterface
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->table = Config::get('rbac.tables.role');
+        $this->table = config('rbac.tables.role');
     }
 
     /**
@@ -25,9 +24,9 @@ class Role extends Model implements RoleInterface
      */
     public function permissions()
     {
-        $rolePermission = Config::get('rbac.tables.role_permission');
-        $roleFk         = Config::get('rbac.foreign.role');
-        $permissionFk   = Config::get('rbac.foreign.permission');
+        $rolePermission = config('rbac.tables.role_permission');
+        $roleFk         = config('rbac.foreign.role');
+        $permissionFk   = config('rbac.foreign.permission');
         return $this->belongsToMany(Permission::class, $rolePermission, $roleFk, $permissionFk);
     }
 
@@ -37,10 +36,10 @@ class Role extends Model implements RoleInterface
      */
     public function users()
     {
-        $userModel = Config::get('rbac.models.user');
-        $roleUser  = Config::get('rbac.tables.role_user');
-        $roleFk    = Config::get('rbac.foreign.role');
-        $userFk    = Config::get('rbac.foreign.user');
+        $userModel = config('rbac.models.user');
+        $roleUser  = config('rbac.tables.role_user');
+        $roleFk    = config('rbac.foreign.role');
+        $userFk    = config('rbac.foreign.user');
         return $this->belongsToMany($userModel, $roleUser, $roleFk, $userFk);
     }
 
@@ -50,9 +49,9 @@ class Role extends Model implements RoleInterface
      */
     public function getPermissions()
     {
-        $enabled   = Config::get('rbac.cache.enabled');
-        $namespace = Config::get('rbac.cache.namespace');
-        $minutes   = Config::get('rbac.cache.minutes');
+        $enabled   = config('rbac.cache.enabled');
+        $namespace = config('rbac.cache.namespace');
+        $minutes   = config('rbac.cache.minutes');
         $key       = "$namespace.permission#{$this->getKey()}";
         if ($enabled) {
             return Cache::remember($key, $minutes, function () {

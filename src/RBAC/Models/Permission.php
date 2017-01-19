@@ -15,7 +15,7 @@ class Permission extends Model implements PermissionInterface
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->table = Config::get('rbac.tables.permission');
+        $this->table = config('rbac.tables.permission');
     }
 
     /**
@@ -24,9 +24,9 @@ class Permission extends Model implements PermissionInterface
      */
     public function roles()
     {
-        $rolePermission = Config::get('rbac.tables.role_permission');
-        $roleFk         = Config::get('rbac.foreign.role');
-        $permissionFk   = Config::get('rbac.foreign.permission');
+        $rolePermission = config('rbac.tables.role_permission');
+        $roleFk         = config('rbac.foreign.role');
+        $permissionFk   = config('rbac.foreign.permission');
         return $this->belongsToMany(Role::class, $rolePermission, $permissionFk, $roleFk);
     }
 }

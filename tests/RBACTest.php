@@ -15,7 +15,7 @@ class RBACTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        Config::set('rbac.cache.enabled', false);
+        config('rbac.cache.enabled', false);
     }
 
     /**
