@@ -6,7 +6,6 @@ namespace DmitryBubyakin\RBAC\Traits;
 use DmitryBubyakin\RBAC\Models\Permission;
 use DmitryBubyakin\RBAC\Models\Role;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 
 trait UserTrait
 {
@@ -16,9 +15,9 @@ trait UserTrait
      */
     public function roles()
     {
-        $rolePermission = Config::get('rbac.tables.role_user');
-        $roleFk         = Config::get('rbac.foreign.role');
-        $userFk         = Config::get('rbac.foreign.permission');
+        $rolePermission = config('rbac.tables.role_user');
+        $roleFk         = config('rbac.foreign.role');
+        $userFk         = config('rbac.foreign.permission');
         return $this->belongsToMany(Role::class, $rolePermission, $userFk, $roleFk);
     }
 
@@ -29,9 +28,9 @@ trait UserTrait
      */
     public function getRoles()
     {
-        $enabled   = Config::get('rbac.cache.enabled');
-        $namespace = Config::get('rbac.cache.namespace');
-        $minutes   = Config::get('rbac.cache.minutes');
+        $enabled   = config('rbac.cache.enabled');
+        $namespace = config('rbac.cache.namespace');
+        $minutes   = config('rbac.cache.minutes');
         $key       = "$namespace.role#{$this->getKey()}";
         if ($enabled) {
             return Cache::remember($key, $minutes, function () {
