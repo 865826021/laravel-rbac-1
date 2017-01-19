@@ -17,7 +17,7 @@ trait UserTrait
     {
         $rolePermission = config('rbac.tables.role_user');
         $roleFk         = config('rbac.foreign.role');
-        $userFk         = config('rbac.foreign.permission');
+        $userFk         = config('rbac.foreign.user');
         return $this->belongsToMany(Role::class, $rolePermission, $userFk, $roleFk);
     }
 
@@ -181,6 +181,9 @@ trait UserTrait
      */
     protected function delimited($haystack, $delimiter = '|')
     {
+        if (is_array($haystack)) {
+            return $haystack;
+        }
         return str_contains($haystack, $delimiter) ? explode($delimiter, $haystack) : $haystack;
     }
 
