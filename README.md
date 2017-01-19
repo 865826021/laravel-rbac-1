@@ -108,6 +108,8 @@ $adminRole->attachPermission($canPost);
 //second way
 $adminRole->attachPermission('can-post');
 $adminRole->attachPermission(['can-post','can-comment']);
+//see middleware to know what second param means
+$adminRole->attachPermission(['can-post','can-comment'],false);
 
 //detach all
 $adminRole->detachPermission();
@@ -137,7 +139,7 @@ $user->roleIs(['admin','user']);
 ## Blade
 
 ```php
-@perm('can-create|can-update')
+@perm('can-create|can-update,false')
 	//...
 @elseperm('can-comment')
 	//...
@@ -154,6 +156,7 @@ $user->roleIs(['admin','user']);
 	//...
 @endrole
 ```
+
 
 ## Middleware
 
