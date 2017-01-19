@@ -26,6 +26,5 @@
     "psr-4": {
       "DmitryBubyakin\\RBAC\\": "src/RBAC"
     }
-  },
-  "minimum-stability": "stable"
+  }
 }
