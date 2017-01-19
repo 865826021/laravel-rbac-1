@@ -105,7 +105,10 @@ class Role extends Model implements RoleInterface
         if ($permission instanceof Permission) {
             $this->permissions()->detach($permission);
         } else if (is_string($permission)) {
-            $perm = Permission::firstOrCreate(['name' => $permission]);
+            $perm = Permission::where(['name' => $permission])->first();
+            if (!$perm) {
+                return;
+            }
             $this->detachPermission($perm);
         } else if (is_array($permission)) {
             foreach ($permission as $perm) {

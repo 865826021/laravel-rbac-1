@@ -84,7 +84,10 @@ trait UserTrait
         if ($role instanceof Role) {
             $this->roles()->detach($role);
         } else if (is_string($role)) {
-            $model = Role::firstOrCreate(['name' => $role]);
+            $model = Role::where(['name' => $role])->first();
+            if (!$model) {
+                return;
+            }
             $this->detachRole($model);
         } else if (is_array($role)) {
             foreach ($role as $r) {
@@ -104,7 +107,7 @@ trait UserTrait
     public function roleIs($role, $requireAll = true)
     {
         $roles = $this->getRoles();
-        $role = $this->delimited($role);
+        $role  = $this->delimited($role);
 
         if (is_string($role)) {
             return $roles->contains('name', $role);
