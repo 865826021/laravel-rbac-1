@@ -3,19 +3,104 @@
 use App\Models\User;
 use DmitryBubyakin\Rbac\Models\Permission;
 use DmitryBubyakin\Rbac\Models\Role;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class RBACTest extends TestCase
+class RbacTest extends TestCase
 {
     use DatabaseTransactions;
 
+
+    /**
+     * @var User
+     */
+    protected $user = null;
+    protected $roles = null;
+    protected $permissions = null;
+
+
+    protected function setUpModels()
+    {
+        $this->user = User::create([
+            'email' => 'test@test.domain',
+            'password' => 'password',
+            'name' => 'user',
+        ]);
+
+        $this->roles = [
+            'admin' => Role::create(['name' => 'admin']),
+            'user' => Role::create(['name' => 'user']),
+        ];
+
+        $this->permissions = [
+            'can-post' => Permission::create(['name' => 'can-post']),
+            'can-comment' => Permission::create(['name' => 'can-comment']),
+            'can-update' => Permission::create(['name' => 'can-update']),
+            'can-delete' => Permission::create(['name' => 'can-delete']),
+        ];
+
+    }
+
+    protected function setUpRoutes()
+    {
+        Route::get('rbac/guest', function () {
+            return 'guest';
+        })->name('rbac.guest');
+
+        Route::get('rbac/admin', function () {
+            return 'admin';
+        })->middleware('rbac.role:admin');
+
+        Route::get('rbac/adminuser', function () {
+            return 'admin';
+        })->middleware('rbac.role:admin|user');//admin and user
+
+        Route::get('rbac/admin-user', function () {
+            return 'admin';
+        })->middleware('rbac.role:admin|user,false');//admin or user
+
+        Route::get('rbac/admin-post-delete', function () {
+            return 'ok';
+        })->middleware(['rbac.can:can-post|can-delete,false', 'rbac.role:admin']);//can-post or can-delete with admin
+
+        Route::get('rbac/admin-postdelete', function () {
+            return 'ok';
+        })->middleware(['rbac.can:can-post|can-delete', 'rbac.role:admin']);//can-post and can-delete with admin
+    }
 
     public function setUp()
     {
         parent::setUp();
         config(['rbac.cache.enabled' => false]);
+
+        $this->setUpModels();
+        $this->setUpRoutes();
+
+    }
+
+    public function testMiddleware()
+    {
+        $this->assertEquals(200, $this->call('GET', 'rbac/guest')->status());
+        $this->assertEquals(403, $this->call('GET', 'rbac/admin')->status());
+
+        $this->actingAs($this->user);
+
+        $this->assertEquals(200, $this->call('GET', 'rbac/guest')->status());
+        $this->assertEquals(403, $this->call('GET', 'rbac/admin')->status());
+
+        $this->user->attachRole($this->roles['admin']);
+        $this->assertEquals(200, $this->call('GET', 'rbac/admin')->status());
+        $this->assertEquals(200, $this->call('GET', 'rbac/admin-user')->status());//admin or user
+        $this->assertEquals(403, $this->call('GET', 'rbac/adminuser')->status());//admin and user
+
+        $this->user->attachRole($this->roles['user']);
+        $this->assertEquals(200, $this->call('GET', 'rbac/adminuser')->status());
+
+        $this->roles['admin']->attachPermission($this->permissions['can-post']);
+        $this->assertEquals(200, $this->call('GET', 'rbac/admin-post-delete')->status());
+        $this->assertEquals(403, $this->call('GET', 'rbac/admin-postdelete')->status());
+
+        $this->roles['user']->attachPermission($this->permissions['can-delete']);
+        $this->assertEquals(200, $this->call('GET', 'rbac/admin-postdelete')->status());
     }
 
     /**
@@ -25,66 +110,78 @@ class RBACTest extends TestCase
      */
     public function testRole()
     {
-        /** @var $user App\Models\User */
-        factory(User::class);
-        $user = User::first();
-        $user->attachRole('admin');
-        $role = $user->roles()->first();
-        $this->assertTrue($role->name === 'admin');
-        $this->assertCount(1, $user->roles()->get());
-        $user->detachRole($role);
-        $this->assertCount(0, $user->roles()->get());
-        $user->attachRole(['admin', 'user', 'student']);
-        $this->assertCount(3, $user->roles()->get());
-        $this->assertTrue($user->roleIs('admin'));
-        $this->assertTrue($user->roleIs(['admin', 'user', 'student']));
-        $this->assertTrue($user->roleIs(['admin', 'user', Role::where('name', 'student')->first()]));
-        $this->assertTrue($user->roleIs(['admin', 'user', 'guest'], false));
-        $this->assertFalse($user->roleIs(['admin', 'user', 'guest']));
-        $user->detachRole('admin');
-        $this->assertCount(2, $user->roles()->get());
-        $this->assertFalse($user->roleIs('admin'));
+        $this->actingAs($this->user);
 
+        $this->assertEquals(0, $this->user->getRoles()->count());
+
+        $this->user->attachRole('admin');
+        $this->assertEquals(1, $this->user->getRoles()->count());
+
+        $this->assertTrue($this->user->roleIs('admin'));
+        $this->assertTrue($this->user->roleIs('admin|user', false));//admin or user
+        $this->assertTrue($this->user->roleIs(['admin', 'user'], false));//admin or user
+
+        $this->assertFalse($this->user->roleIs('admin|user'));//admin and user
+        $this->assertFalse($this->user->roleIs(['admin', 'user']));//admin and user
+
+        $this->user->detachRole('admin');
+        $this->assertEquals(0, $this->user->getRoles()->count());
+
+        $this->assertFalse($this->user->roleIs('admin'));
+        $this->assertFalse($this->user->roleIs('admin|user'));
+        $this->assertFalse($this->user->roleIs('admin|user', false));
+
+        $this->user->attachRole(['admin', 'user']);
+        $this->assertEquals(2, $this->user->getRoles()->count());
+
+        $this->assertTrue($this->user->roleIs('admin'));
+        $this->assertTrue($this->user->roleIs('admin|user', false));//admin or user
+        $this->assertTrue($this->user->roleIs(['admin', 'user'], false));//admin or user
+
+        $this->assertTrue($this->user->roleIs('admin|user'));//admin and user
+        $this->assertTrue($this->user->roleIs(['admin', 'user']));//admin and user
+
+        $this->user->detachRole(['admin', 'user']);
+        $this->assertEquals(0, $this->user->getRoles()->count());
     }
 
     public function testPermission()
     {
-        /** @var $user User */
-        factory(User::class);
-        $user = User::first();
-        $user->attachRole(['admin', 'user', 'student']);
-        $roles = $user->roles()->get();
+        $this->actingAs($this->user);
 
-        $adminRole   = $roles->where('name', 'admin')->first();
-        $userRole    = $roles->where('name', 'user')->first();
-        $studentRole = $roles->where('name', 'student')->first();
+        $admin = $this->roles['admin'];
 
-        $adminRole->attachPermission(['post', 'update', 'delete', 'comment', 'create']);
-        $userRole->attachPermission(['fill', 'send', 'test']);
-        $studentRole->attachPermission('sleep');
-        $studentRole->attachPermission(Permission::create(['name' => 'watch']));
+        $this->assertFalse($admin->hasPermission('can-post'));
+        $this->assertFalse($admin->hasPermission(['can-post', 'can-delete']));
+        $this->assertFalse($admin->hasPermission(['can-post', 'can-delete'], false));
 
-        $this->assertTrue($adminRole->hasPermission(['post', 'update', 'delete', 'comment', 'create']));
-        $this->assertTrue($adminRole->hasPermission(['post', Permission::where('name', 'create')->first()]));
+        $admin->attachPermission('can-post');
+        $this->assertEquals(1, $admin->getPermissions()->count());
 
-        $this->assertTrue($user->can('post'));
-        $this->assertTrue($user->can('fill'));
-        $this->assertTrue($user->can('watch'));
+        $this->assertTrue($admin->hasPermission('can-post'));
+        $this->assertFalse($admin->hasPermission(['can-post', 'can-delete']));
+        $this->assertTrue($admin->hasPermission(['can-post', 'can-delete'], false));
+
+        $admin->attachPermission('can-delete');
+        $this->assertEquals(2, $admin->getPermissions()->count());
+
+        $this->assertTrue($admin->hasPermission('can-post'));
+        $this->assertTrue($admin->hasPermission(['can-post', 'can-delete']));
+        $this->assertTrue($admin->hasPermission(['can-post', 'can-delete'], false));
+
+        $admin->detachPermission('can-post');
+        $this->assertEquals(1, $admin->getPermissions()->count());
+
+        $this->assertFalse($admin->hasPermission('can-post'));
+        $this->assertFalse($admin->hasPermission(['can-post', 'can-delete']));
+        $this->assertTrue($admin->hasPermission(['can-post', 'can-delete'], false));
 
 
-        $this->assertTrue($user->can(['fill', 'post', 'sleep']));
-        $this->assertTrue($user->can(['fill', 'wake up'], false));
-        $this->assertTrue($user->can(['wake up', 'fill'], false));
-
-        $studentRole->detachPermission('watch');
-
-        $userRole->permissions()->sync([]);
-
-        $this->assertFalse($user->can('watch'));
-        $this->assertFalse($user->can(['fill', 'send', 'test']));
-        $this->assertFalse($user->can(['fill', 'send', 'comment']));
-
-        $this->assertTrue($user->can(['fill', 'send', 'comment'], false));
-
+        $admin->attachPermission(['can-post','1','2','3','4','5']);
+        $this->assertEquals(7, $admin->getPermissions()->count());
+        $admin->detachPermission(['3','4','5']);
+        $this->assertEquals(4, $admin->getPermissions()->count());
+        $admin->detachPermission();//detach all
+        $this->assertEquals(0, $admin->getPermissions()->count());
     }
 }
