@@ -20,7 +20,7 @@ class Role
      */
     public function handle($request, Closure $next, $roles, $require = true, $redirect = null)
     {
-        $require = is_string($require) ? strcasecmp('true',(string)$require) === 0 : $require;
+        $require = $require == true;
         if (Auth::guest() || !Auth::user()->roleIs($roles, $require)) {
             if ($redirect) {
                 return redirect()->route($redirect);
