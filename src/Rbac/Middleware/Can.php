@@ -22,7 +22,7 @@ class Can
      */
     public function handle($request, Closure $next, $permissions, $require = true, $redirect = null)
     {
-        $require = $require == true;
+        $require = $require == 'true';
         if (Auth::guest() || !Auth::user()->can($permissions,$require)) {
             if($redirect){
                 return redirect()->route($redirect);
