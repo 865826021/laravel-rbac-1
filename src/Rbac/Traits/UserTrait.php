@@ -1,10 +1,10 @@
 <?php
 
-namespace DmitryBubyakin\RBAC\Traits;
+namespace DmitryBubyakin\Rbac\Traits;
 
 
-use DmitryBubyakin\RBAC\Models\Permission;
-use DmitryBubyakin\RBAC\Models\Role;
+use DmitryBubyakin\Rbac\Models\Permission;
+use DmitryBubyakin\Rbac\Models\Role;
 use Illuminate\Support\Facades\Cache;
 
 trait UserTrait

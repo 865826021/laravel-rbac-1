@@ -1,10 +1,10 @@
 <?php
 
-namespace DmitryBubyakin\RBAC\Models;
+namespace DmitryBubyakin\Rbac\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
-use DmitryBubyakin\RBAC\Contracts\Permission as PermissionInterface;
+use DmitryBubyakin\Rbac\Contracts\Permission as PermissionInterface;
 
 class Permission extends Model implements PermissionInterface
 {

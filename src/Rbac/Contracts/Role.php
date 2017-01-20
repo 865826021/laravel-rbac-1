@@ -1,6 +1,6 @@
 <?php
 
-namespace DmitryBubyakin\RBAC\Contracts;
+namespace DmitryBubyakin\Rbac\Contracts;
 
 
 interface Role

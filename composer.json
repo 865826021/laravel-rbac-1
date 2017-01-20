@@ -24,7 +24,7 @@
   },
   "autoload": {
     "psr-4": {
-      "DmitryBubyakin\\RBAC\\": "src/RBAC"
+      "DmitryBubyakin\\Rbac\\": "src/Rbac"
     }
   }
 }

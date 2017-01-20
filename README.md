@@ -1,4 +1,4 @@
-# laravel-rbac
+# Laravel-Rbac
 Role based access control for laravel 5
 
 ## Installation
@@ -6,24 +6,24 @@ Role based access control for laravel 5
 1) Open your composer.json and add the following. Then run `composer update`
 
 ```json
-"dmitrybubyakin/laravel-rbac": "dev-master"
+"dmitrybubyakin/laravel-Rbac": "dev-master"
 ```
 
 2) Open your `config/app.php` and add the following to `providers` array:
 
 ```php
-DmitryBubyakin\RBAC\RBACServiceProvider::class
+DmitryBubyakin\Rbac\RbacServiceProvider::class
 ```
 
 3) Run the command `php artisan vendor:publish` to publish config and migration files, then run `php artisan migrate`
 
-4) Open `config/rbac.php` and change the following to your models:
+4) Open `config/Rbac.php` and change the following to your models:
 
 ```php
 'models' => [
-  'role' => DmitryBubyakin\RBAC\Models\Role::class,
+  'role' => DmitryBubyakin\Rbac\Models\Role::class,
   'user' => App\Models\User::class,
-  'permission' => DmitryBubyakin\RBAC\Models\Permission::class,
+  'permission' => DmitryBubyakin\Rbac\Models\Permission::class,
 ]
 ```
 
@@ -38,7 +38,7 @@ To create a Role model in your project use the following:
 ```php
 namespace App\Models;
 
-use DmitryBubyakin\RBAC\Models\Role as BaseRole;
+use DmitryBubyakin\Rbac\Models\Role as BaseRole;
 
 class Role extends BaseRole{
 	
@@ -50,7 +50,7 @@ To create a Permission model in your project use the following:
 ```php
 namespace App\Models;
 
-use DmitryBubyakin\RBAC\Models\Permission as BasePermission;
+use DmitryBubyakin\Rbac\Models\Permission as BasePermission;
 
 class Permission extends BasePermission{
 	
@@ -69,7 +69,7 @@ Use the UserTrait in your User model:
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use DmitryBubyakin\RBAC\Traits\UserTrait;
+use DmitryBubyakin\Rbac\Traits\UserTrait;
 
 class User extends Authenticatable
 {
@@ -79,6 +79,7 @@ class User extends Authenticatable
 ```
 
 ## Usage
+[See this test](https://github.com/dmitrybubyakin/laravel-rbac/blob/master/tests/RbacTest.php)
 
 Creating roles and permissions:
 
@@ -162,8 +163,8 @@ $user->roleIs(['admin','user']);
 
 If you want to use middleware, you need to add the following to routeMiddleware array in `App\Http\Kernel.php`:
 ```php
-'rbac.can' => \DmitryBubyakin\RBAC\Middleware\Can::class,
-'rbac.role' => \DmitryBubyakin\RBAC\Middleware\Role::class,
+'rbac.can' => \DmitryBubyakin\Rbac\Middleware\Can::class,
+'rbac.role' => \DmitryBubyakin\Rbac\Middleware\Role::class,
 ```
 
 Both middlewares have two attributes:

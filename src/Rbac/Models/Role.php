@@ -1,10 +1,10 @@
 <?php
 
-namespace DmitryBubyakin\RBAC\Models;
+namespace DmitryBubyakin\Rbac\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
-use DmitryBubyakin\RBAC\Contracts\Role as RoleInterface;
+use DmitryBubyakin\Rbac\Contracts\Role as RoleInterface;
 
 class Role extends Model implements RoleInterface
 {

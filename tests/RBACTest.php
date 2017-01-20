@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\User;
-use DmitryBubyakin\RBAC\Models\Permission;
-use DmitryBubyakin\RBAC\Models\Role;
+use DmitryBubyakin\Rbac\Models\Permission;
+use DmitryBubyakin\Rbac\Models\Role;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;

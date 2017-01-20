@@ -1,10 +1,10 @@
 <?php
 
-namespace DmitryBubyakin\RBAC;
+namespace DmitryBubyakin\Rbac;
 
 use Illuminate\Support\ServiceProvider;
 
-class RBACServiceProvider extends ServiceProvider
+class RbacServiceProvider extends ServiceProvider
 {
     public function boot()
     {

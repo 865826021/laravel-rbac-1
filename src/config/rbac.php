@@ -2,9 +2,9 @@
 
 return [
     'models' => [
-        'role' => DmitryBubyakin\RBAC\Models\Role::class,
-        'user' => 'App\Models\User',
-        'permission' => DmitryBubyakin\RBAC\Models\Permission::class,
+        'role' => DmitryBubyakin\Rbac\Models\Role::class,
+        'user' => 'App\User',
+        'permission' => DmitryBubyakin\Rbac\Models\Permission::class,
     ],
     'tables' => [
         'role' => 'roles',
