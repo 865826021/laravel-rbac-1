@@ -24,7 +24,7 @@ return [
     ],
     'middleware' => [
         'except' => [
-            'admin'
+            'your-role-name,example - admin'
         ]
     ],
 ];
