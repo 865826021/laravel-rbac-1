@@ -6,7 +6,7 @@ Role based access control for laravel 5
 1) Open your composer.json and add the following. Then run `composer update`
 
 ```json
-"dmitrybubyakin/laravel-Rbac": "1.1.2"
+"dmitrybubyakin/laravel-Rbac": "1.1.4"
 ```
 
 2) Open your `config/app.php` and add the following to `providers` array:

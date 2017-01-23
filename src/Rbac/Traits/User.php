@@ -29,9 +29,8 @@ trait User
     public function getRoles()
     {
         $enabled   = config('rbac.cache.enabled');
-        $namespace = config('rbac.cache.namespace');
         $minutes   = config('rbac.cache.minutes');
-        $key       = "$namespace.role#{$this->getKey()}";
+        $key       = static::class.".rbac#{$this->getKey()}";
         if ($enabled) {
             return Cache::remember($key, $minutes, function () {
                 return $this->roles()->get();
@@ -146,16 +145,15 @@ trait User
             return $this->traverse($roles, $permission);
         } else if (is_array($permission)) {
             $total = count($permission);
-            $count = 0;
             foreach ($permission as $perm) {
                 if ($this->traverse($roles, $perm)) {
-                    $count++;
+                    $total--;
                     if (!$requireAll) {
-                        break;
+                        return true;
                     }
                 }
             }
-            return $requireAll ? $total === $count : $count > 0;
+            return !$total;
         }
 
         return false;

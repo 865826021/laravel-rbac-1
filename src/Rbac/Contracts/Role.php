@@ -5,8 +5,6 @@ namespace DmitryBubyakin\Rbac\Contracts;
 
 interface Role
 {
-    public function getPermissions();
-
     public function permissions();
 
     public function users();

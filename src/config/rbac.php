@@ -19,7 +19,6 @@ return [
     ],
     'cache' => [
         'enabled' => true,
-        'namespace' => 'rbac',
         'minutes' => 1,
     ],
     'middleware' => [
