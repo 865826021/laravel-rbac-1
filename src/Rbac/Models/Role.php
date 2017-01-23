@@ -5,6 +5,7 @@ namespace DmitryBubyakin\Rbac\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use DmitryBubyakin\Rbac\Contracts\Role as RoleInterface;
+use DmitryBubyakin\Rbac\Contracts\Permission as PermissionInterface;
 
 class Role extends Model implements RoleInterface
 {
@@ -50,9 +51,8 @@ class Role extends Model implements RoleInterface
     public function getPermissions()
     {
         $enabled   = config('rbac.cache.enabled');
-        $namespace = config('rbac.cache.namespace');
         $minutes   = config('rbac.cache.minutes');
-        $key       = "$namespace.permission#{$this->getKey()}";
+        $key       = static::class.".rbac#{$this->getKey()}";
         if ($enabled) {
             return Cache::remember($key, $minutes, function () {
                 return $this->permissions()->get();
@@ -127,24 +127,23 @@ class Role extends Model implements RoleInterface
      */
     public function hasPermission($permission, $requireAll = true)
     {
-        $permissions = $this->getPermissions();
+        $perms = $this->getPermissions();
         if (is_string($permission)) {
-            return $permissions->contains('name', $permission);
-        } else if ($permission instanceof Permission) {
-            return $permissions->contains($permission);
+            return $perms->contains('name', $permission);
+        } else if ($permission instanceof PermissionInterface) {
+            return $perms->contains($permission);
         } else if (is_array($permission)) {
             $total = count($permission);
-            $count = 0;
             foreach ($permission as $perm) {
-                $perm = $perm instanceof Permission ? $perm->name : $perm;
-                if ($permissions->contains('name', $perm)) {
-                    $count++;
+                $perm = $perm instanceof PermissionInterface ? $perm->name : $perm;
+                if ($perms->contains('name', $perm)) {
+                    $total--;
                     if (!$requireAll) {
-                        break;
+                        return true;
                     }
                 }
             }
-            return $requireAll ? $count === $total : $count > 0;
+            return !$total;
         }
     }
 }

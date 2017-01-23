@@ -6,14 +6,24 @@ use Illuminate\Support\ServiceProvider;
 
 class RbacServiceProvider extends ServiceProvider
 {
+
+    /**
+     * Migration file name
+     */
+    const MIGRATION = 'create_rbac_tables.php';
+    /**
+     * Migrations path
+     */
+    const MIGRATION_PATH = 'database/migrations/';
+
     public function boot()
     {
-        $migration      = 'create_rbac_tables.php';
-        $datedMigration = $this->getMigrationName($migration);
+        if (!$this->migrationExists()) {
+            $this->publishes([
+                __DIR__ . '/../migrations/' . static::MIGRATION => $this->getMigrationName()
+            ]);
+        }
 
-        $this->publishes([
-            __DIR__ . '/../migrations/' . $migration => base_path('database/migrations/' . $datedMigration)
-        ]);
         $this->publishes([
             __DIR__ . '/../config' => base_path('config')
         ]);
@@ -27,6 +37,10 @@ class RbacServiceProvider extends ServiceProvider
         $this->registerBlade();
     }
 
+    /**
+     * Register blade directives
+     * @return void
+     */
     public function registerBlade()
     {
         \Blade::directive('perm', function ($expression) {
@@ -54,9 +68,22 @@ class RbacServiceProvider extends ServiceProvider
         });
     }
 
-    protected function getMigrationName($name)
+    /**
+     * Get migration name Y_m_d_His_migration_name
+     * @return string
+     */
+    protected function getMigrationName()
     {
-        return sprintf('%s_%s', date('Y_m_d_His'), $name);
+        return static::MIGRATION_PATH . date('Y_m_d_His') . '_' . static::MIGRATION;
+    }
+
+    /**
+     * Check if migration exists
+     * @return bool
+     */
+    protected function migrationExists()
+    {
+        return !empty(glob(base_path(static::MIGRATION_PATH . '*' . static::MIGRATION)));
     }
 
 }
