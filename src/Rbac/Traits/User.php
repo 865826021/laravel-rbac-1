@@ -7,7 +7,7 @@ use DmitryBubyakin\Rbac\Models\Permission;
 use DmitryBubyakin\Rbac\Models\Role;
 use Illuminate\Support\Facades\Cache;
 
-trait UserTrait
+trait User
 {
     /**
      * Relations with the role model

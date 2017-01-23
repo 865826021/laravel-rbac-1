@@ -22,4 +22,9 @@ return [
         'namespace' => 'rbac',
         'minutes' => 1,
     ],
+    'middleware' => [
+        'except' => [
+            'admin'
+        ]
+    ],
 ];

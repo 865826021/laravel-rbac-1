@@ -63,17 +63,17 @@ Both role and permission have two attributes:
 
 #### User
 
-Use the UserTrait in your User model:
+Use the User in your User model:
 
 ```php
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use DmitryBubyakin\Rbac\Traits\UserTrait;
+use DmitryBubyakin\Rbac\Traits\User as RbacUser;
 
 class User extends Authenticatable
 {
-    use UserTrait;
+    use RbacUser;
 
 }
 ```

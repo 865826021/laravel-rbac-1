@@ -8,8 +8,18 @@ class RbacServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        $this->publishes([__DIR__ . '/../migrations' => base_path('database/migrations')]);
-        $this->publishes([__DIR__ . '/../config' => base_path('config')]);
+        $migration      = 'create_rbac_tables.php';
+        $datedMigration = $this->getMigrationName($migration);
+
+        $this->publishes([
+            __DIR__ . '/../migrations/' . $migration => base_path('database/migrations/' . $datedMigration)
+        ]);
+        $this->publishes([
+            __DIR__ . '/../config' => base_path('config')
+        ]);
+        $this->publishes([
+            __DIR__ . '/../../tests' => base_path('tests/Rbac')
+        ]);
     }
 
     public function register()
@@ -43,4 +53,10 @@ class RbacServiceProvider extends ServiceProvider
             return "<?php endif; ?>";
         });
     }
+
+    protected function getMigrationName($name)
+    {
+        return sprintf('%s_%s', date('Y_m_d_His'), $name);
+    }
+
 }

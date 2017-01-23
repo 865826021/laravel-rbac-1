@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 class Can
 {
 
-
     /**
      * Handle an incoming request.
      *

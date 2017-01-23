@@ -4,10 +4,13 @@ namespace DmitryBubyakin\Rbac\Middleware;
 
 
 use Closure;
+use DmitryBubyakin\Rbac\Traits\Except;
 use Illuminate\Support\Facades\Auth;
 
 class Role
 {
+    use Except;
+
     /**
      * Handle an incoming request.
      *
@@ -20,6 +23,10 @@ class Role
      */
     public function handle($request, Closure $next, $roles, $require = true, $redirect = null)
     {
+        if ($this->excepted()) {
+            return $next($request);
+        }
+
         $require = $require == 'true';
         if (Auth::guest() || !Auth::user()->roleIs($roles, $require)) {
             if ($redirect) {
