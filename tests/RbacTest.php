@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\User;
 use DmitryBubyakin\Rbac\Models\Permission;
 use DmitryBubyakin\Rbac\Models\Role;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -50,6 +50,10 @@ class RbacTest extends TestCase
             return 'admin';
         })->middleware('rbac.role:admin');
 
+        Route::get('rbac/superuser', function () {
+            return 'superuser';
+        })->middleware('rbac.role:superuser');
+
         Route::get('rbac/adminuser', function () {
             return 'admin';
         })->middleware('rbac.role:admin|user');//admin and user
@@ -91,6 +95,12 @@ class RbacTest extends TestCase
         $this->assertEquals(200, $this->call('GET', 'rbac/admin')->status());
         $this->assertEquals(200, $this->call('GET', 'rbac/admin-user')->status());//admin or user
         $this->assertEquals(403, $this->call('GET', 'rbac/adminuser')->status());//admin and user
+
+
+        $this->assertEquals(403, $this->call('GET', 'rbac/superuser')->status());
+        config(['rbac.middleware.except' => ['admin']]);
+        $this->assertEquals(200, $this->call('GET', 'rbac/superuser')->status());
+        config(['rbac.middleware.except' => []]);
 
         $this->user->attachRole($this->roles['user']);
         $this->assertEquals(200, $this->call('GET', 'rbac/adminuser')->status());
